@@ -19,7 +19,7 @@ dist_params = dict(backend='nccl')
 log_level = 'INFO'
 load_from = None
 resume_from = None
-workflow = [('train', 1)]
+workflow = [('train', 1), ('val', 1)]
 dataset_type = 'RetinaFaceDataset'
 data_root = 'data/widerface/'
 train_root = 'data/widerface/'
@@ -31,8 +31,8 @@ data = dict(
     workers_per_gpu=4,
     train=dict(
         type='RetinaFaceDataset',
-        ann_file='data/widerface/labelv2/train/labelv2.txt',
-        img_prefix='data/widerface/WIDER_train/images/',
+        ann_file='data/custom/labelv2/train/labelv2.txt',
+        # img_prefix='data/custom/WIDER_train/images/',
         pipeline=[
             dict(type='LoadImageFromFile', to_float32=True),
             dict(type='LoadAnnotations', with_bbox=True, with_keypoints=True),
@@ -56,8 +56,8 @@ data = dict(
         ]),
     val=dict(
         type='RetinaFaceDataset',
-        ann_file='data/widerface/labelv2/val/labelv2.txt',
-        img_prefix='data/widerface/WIDER_val/images/',
+        ann_file='data/custom/labelv2/val/labelv2.txt',
+        # img_prefix='data/widerface/WIDER_val/images/',
         pipeline=[
             dict(type='LoadImageFromFile'),
             dict(
@@ -79,8 +79,8 @@ data = dict(
         ]),
     test=dict(
         type='RetinaFaceDataset',
-        ann_file='data/widerface/labelv2/val/labelv2.txt',
-        img_prefix='data/widerface/WIDER_val/images/',
+        ann_file='data/custom/labelv2/val/labelv2.txt',
+        # img_prefix='data/widerface/WIDER_val/images/',
         pipeline=[
             dict(type='LoadImageFromFile'),
             dict(
@@ -135,6 +135,9 @@ model = dict(
             reduction='sum',
             loss_weight=1.0),
     ),
+
+    # train_cfg and test_cfg is deprecated, please specify them in model
+
     train_cfg=dict(assigner=dict(type='SimOTAAssigner', center_radius=2.5)),
     test_cfg=dict(
         nms_pre=-1,
@@ -143,4 +146,4 @@ model = dict(
         nms=dict(type='nms', iou_threshold=0.45),
         max_per_img=-1,
     ))
-evaluation = dict(interval=1001, metric='mAP')
+evaluation = dict(interval=1, metric='mAP')

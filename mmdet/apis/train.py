@@ -127,13 +127,14 @@ def train_detector(model,
 
     # prepare data loaders
     dataset = dataset if isinstance(dataset, (list, tuple)) else [dataset]
+    logger.info(dataset)
 
     runner_type = 'EpochBasedRunner' if 'runner' not in cfg else cfg.runner[
         'type']
 
     train_dataloader_default_args = dict(
         samples_per_gpu=2,
-        workers_per_gpu=2,
+        workers_per_gpu=1,
         # `num_gpus` will be ignored if distributed
         num_gpus=len(cfg.gpu_ids),
         dist=distributed,
@@ -166,6 +167,8 @@ def train_detector(model,
     auto_scale_lr(cfg, distributed, logger)
     optimizer = build_optimizer(model, cfg.optimizer)
 
+    logger.info('start runner')
+
     runner = build_runner(
         cfg.runner,
         default_args=dict(
@@ -188,6 +191,7 @@ def train_detector(model,
     else:
         optimizer_config = cfg.optimizer_config
 
+    logger.info('start register training hooks')
     # register hooks
     runner.register_training_hooks(
         cfg.lr_config,
@@ -202,10 +206,13 @@ def train_detector(model,
             runner.register_hook(DistSamplerSeedHook())
 
     # register eval hooks
+    
+    logger.info('start register eval hooks')
+
     if validate:
         val_dataloader_default_args = dict(
             samples_per_gpu=1,
-            workers_per_gpu=2,
+            workers_per_gpu=1,
             dist=distributed,
             shuffle=False,
             persistent_workers=False)
@@ -231,6 +238,8 @@ def train_detector(model,
         runner.register_hook(
             eval_hook(val_dataloader, **eval_cfg), priority='LOW')
 
+    logger.info('start resume from')
+
     resume_from = None
     if cfg.resume_from is None and cfg.get('auto_resume'):
         resume_from = find_latest_checkpoint(cfg.work_dir)
@@ -241,4 +250,12 @@ def train_detector(model,
         runner.resume(cfg.resume_from)
     elif cfg.load_from:
         runner.load_checkpoint(cfg.load_from)
+
+    # logger.info(len(data_loaders))
+    # train_features, train_labels = next(iter(data_loaders))
+    # logger.info(f"Feature batch shape: {train_features.size()}")
+    # logger.info(f"Labels batch shape: {train_labels.size()}")
+
+    logger.info('Runner.run')
+
     runner.run(data_loaders, cfg.workflow)

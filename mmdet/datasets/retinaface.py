@@ -28,6 +28,8 @@ class RetinaFaceDataset(CustomDataset):
 
     def _parse_ann_line(self, line):
         values = [float(x) for x in line.strip().split()]
+        print('*'*30)
+        print(line)
         bbox = np.array(values[0:4], dtype=np.float32)
         kps = np.zeros((self.NK, 3), dtype=np.float32)
         ignore = False
@@ -37,22 +39,22 @@ class RetinaFaceDataset(CustomDataset):
             h = bbox[3] - bbox[1]
             if w < self.min_size or h < self.min_size:
                 ignore = True
-        if len(values) > 4:
-            if len(values) > 5:
-                kps = np.array(
-                    values[4:19], dtype=np.float32).reshape((self.NK, 3))
-                for li in range(kps.shape[0]):
-                    if (kps[li, :] == -1).all():
-                        kps[li][2] = 0.0  # weight = 0, ignore
-                    else:
-                        assert kps[li][2] >= 0
-                        kps[li][2] = 1.0  # weight
+        # if len(values) > 4:
+        #     if len(values) > 5:
+        #         kps = np.array(
+        #             values[4:19], dtype=np.float32).reshape((self.NK, 3))
+        #         for li in range(kps.shape[0]):
+        #             if (kps[li, :] == -1).all():
+        #                 kps[li][2] = 0.0  # weight = 0, ignore
+        #             else:
+        #                 assert kps[li][2] >= 0
+        #                 kps[li][2] = 1.0  # weight
 
-            else:
-                if not ignore:
-                    ignore = (values[4] == 1)
-        else:
-            assert self.test_mode
+        #     else:
+        #         if not ignore:
+        #             ignore = (values[4] == 1)
+        # else:
+        #     assert self.test_mode
 
         return dict(bbox=bbox, kps=kps, ignore=ignore, cat='FG')
 
