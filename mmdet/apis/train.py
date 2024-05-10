@@ -163,6 +163,18 @@ def train_detector(model,
     else:
         model = build_dp(model, cfg.device, device_ids=cfg.gpu_ids)
 
+    '''
+    Freezing the backbone params
+
+        for name, param in model.named_parameters():
+            if 'backbone' in name:
+                param.requires_grad = False
+            else:
+                param.requires_gard = True
+    '''
+
+        
+    
     # build optimizer
     auto_scale_lr(cfg, distributed, logger)
     optimizer = build_optimizer(model, cfg.optimizer)

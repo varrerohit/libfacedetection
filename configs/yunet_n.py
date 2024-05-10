@@ -31,7 +31,7 @@ data = dict(
     workers_per_gpu=4,
     train=dict(
         type='RetinaFaceDataset',
-        ann_file='data/custom/labelv2/train/labelv2.txt',
+        ann_file='/home/rohit/Projects/Face_Det/Models/YuNet/custom_train/libfacedetection.train/data/custom/labelv2/train/labelv2.txt',
         # img_prefix='data/custom/WIDER_train/images/',
         pipeline=[
             dict(type='LoadImageFromFile', to_float32=True),
@@ -56,7 +56,7 @@ data = dict(
         ]),
     val=dict(
         type='RetinaFaceDataset',
-        ann_file='data/custom/labelv2/val/labelv2.txt',
+        ann_file='/home/rohit/Projects/Face_Det/Models/YuNet/custom_train/libfacedetection.train/data/custom/labelv2/val/labelv2.txt',
         # img_prefix='data/widerface/WIDER_val/images/',
         pipeline=[
             dict(type='LoadImageFromFile'),

@@ -19,6 +19,8 @@ from mmdet.datasets import build_dataset
 from mmdet.models import build_detector
 from mmdet.utils import (collect_env, get_device, get_root_logger,
                          setup_multi_processes, update_data_root)
+import wandb
+wandb.login()
 
 
 def parse_args():

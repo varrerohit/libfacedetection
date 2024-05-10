@@ -1,5 +1,5 @@
 import numpy as np
-
+import cv2
 from .builder import DATASETS
 from .custom import CustomDataset
 
@@ -74,8 +74,11 @@ class RetinaFaceDataset(CustomDataset):
             if line.startswith('#'):
                 value = line[1:].strip().split()
                 name = value[0]
-                width = int(value[1])
-                height = int(value[2])
+                temp = cv2.imread(name)
+                width = int(temp.shape[1])
+                height = int(temp.shape[0])
+                # width = int(value[1])
+                # height = int(value[2])
 
                 bbox_map[name] = dict(width=width, height=height, objs=[])
                 continue
